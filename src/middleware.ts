@@ -1,5 +1,6 @@
 import type { Middleware } from 'koa';
 import vary from 'vary';
+import { acac, acah, acam, acao, acapn, aceh, acrh, acrm, acrpn, coep, coop, rc, so } from './headers';
 import type { Options } from './type';
 
 const defaultOptions: Options = {
@@ -54,23 +55,20 @@ const cors = (inputOptions?: Readonly<Options>): Middleware => {
 
     // 处理非预检请求，简单请求
     if (ctx.method.toUpperCase() !== 'OPTIONS') {
-      set('Access-Control-Allow-Origin', origin);
+      set(acao, origin);
 
       if (credentials === true) {
-        set('Access-Control-Allow-Credentials', credentials.toString());
+        set(acac, credentials.toString());
       }
 
       if (options.exposeHeaders) {
         // 前面已经转换为string了
-        set(
-          'Access-Control-Expose-Headers',
-          Array.isArray(options.exposeHeaders) ? options.exposeHeaders.join(',') : options.exposeHeaders
-        );
+        set(aceh, Array.isArray(options.exposeHeaders) ? options.exposeHeaders.join(',') : options.exposeHeaders);
       }
 
       if (options.secureContext) {
-        set('Cross-Origin-Opener-Policy', 'same-origin');
-        set('Cross-Origin-Embedder-Policy', 'require-corp');
+        set(coop, so);
+        set(coep, rc);
       }
 
       if (!options.keepHeadersOnError) {
@@ -93,39 +91,39 @@ const cors = (inputOptions?: Readonly<Options>): Middleware => {
       }
     } else {
       // 处理预检请求
-      if (!ctx.get('Access-Control-Request-Method')) {
+      if (!ctx.get(acrm)) {
         // 非预检请求，直接走下去
         return await next();
       }
-      ctx.set('Access-Control-Allow-Origin', origin);
+      ctx.set(acao, origin);
       if (credentials === true) {
-        ctx.set('Access-Control-Allow-Credentials', 'true');
+        ctx.set(acac, 'true');
       }
       if (options.maxAge) {
-        ctx.set('Access-Control-Max-Age', options.maxAge.toString());
+        ctx.set(acam, options.maxAge.toString());
       }
 
-      if (options.privateNetworkAccess && ctx.get('Access-Control-Request-Private-Network')) {
-        ctx.set('Access-Control-Allow-Private-Network', 'true');
+      if (options.privateNetworkAccess && ctx.get(acrpn)) {
+        ctx.set(acapn, 'true');
       }
       if (options.allowMethods) {
-        ctx.set('Access-Control-Allow-Methods', options.allowMethods);
+        ctx.set(acam, options.allowMethods);
       }
       if (options.allowMethods) {
-        ctx.set('Access-Control-Allow-Methods', options.allowMethods);
+        ctx.set(acam, options.allowMethods);
       }
 
       if (options.secureContext) {
-        set('Cross-Origin-Opener-Policy', 'same-origin');
-        set('Cross-Origin-Embedder-Policy', 'require-corp');
+        set(coop, so);
+        set(coep, rc);
       }
 
       let allowHeaders = options.allowHeaders;
       if (!allowHeaders) {
-        allowHeaders = ctx.get('Access-Control-Request-Headers');
+        allowHeaders = ctx.get(acrh);
       }
       if (allowHeaders) {
-        ctx.set('Access-Control-Allow-Headers', allowHeaders);
+        ctx.set(acah, allowHeaders);
       }
 
       ctx.status = 204;
