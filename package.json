@@ -1,6 +1,6 @@
 {
   "name": "@liry-ccc/koa-cors-middleware",
-  "version": "",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/LiryCcc/liry-koa-cors-middleware.git"
