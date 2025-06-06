@@ -361,4 +361,34 @@ describe('cors.test.js', function () {
         .expect(200);
     });
   });
+
+  describe('options.credentials', function () {
+    const app = new Koa();
+    app.use(
+      cors({
+        credentials: true
+      })
+    );
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Simple request', async () => {
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(correctBody)
+        .expect(200);
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Preflight request', async () => {
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'DELETE')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(204);
+    });
+  });
 });
