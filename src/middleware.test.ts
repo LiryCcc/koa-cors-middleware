@@ -419,4 +419,57 @@ describe('cors.test.js', () => {
       assert.equal(!header, true, 'Access-Control-Allow-Credentials must not be set.');
     });
   });
+
+  describe('options.credentials=function', () => {
+    const app = new Koa();
+    app.use(
+      cors({
+        credentials(ctx) {
+          return ctx.url !== '/forbin';
+        }
+      })
+    );
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Simple request', async () => {
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(correctBody)
+        .expect(200);
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Preflight request', async () => {
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'DELETE')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(204);
+    });
+
+    it('should disable Access-Control-Allow-Credentials on Simple request', async () => {
+      const res = await request(app.listen())
+        .get('/forbin')
+        .set('Origin', 'http://koajs.com')
+        .expect(correctBody)
+        .expect(200);
+
+      const header = res.headers['access-control-allow-credentials'];
+      assert.equal(header, undefined, 'Access-Control-Allow-Credentials must not be set.');
+    });
+
+    it('should disable Access-Control-Allow-Credentials on Preflight request', async () => {
+      const res = await request(app.listen())
+        .options('/forbin')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'DELETE')
+        .expect(204);
+      const header = res.headers['access-control-allow-credentials'];
+      assert.equal(header, undefined, 'Access-Control-Allow-Credentials must not be set.');
+    });
+  });
 });
