@@ -694,4 +694,27 @@ describe('cors.test.js', () => {
       assert(!res.headers.vary);
     });
   });
+
+  describe('other middleware has been set `Vary` header to Accept-Encoding', () => {
+    const app = new Koa();
+    app.use(function (ctx, next) {
+      ctx.set('Vary', 'Accept-Encoding');
+      return next();
+    });
+
+    app.use(cors());
+
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('should append `Vary` header to Origin', async () => {
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Vary', 'Accept-Encoding, Origin')
+        .expect(correctBody)
+        .expect(200);
+    });
+  });
 });
