@@ -16,4 +16,9 @@ class WrappedPromise<T> implements PromiseLike<T> {
   }
 }
 
+interface HttpError extends Error {
+  headers?: Record<string, string>;
+}
+
 export { WrappedPromise };
+export type { HttpError };

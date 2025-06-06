@@ -2,7 +2,7 @@ import Koa from 'koa';
 import request from 'supertest';
 import { assert, describe, expect, it } from 'vitest';
 import cors from './middleware';
-import { WrappedPromise } from './utils';
+import { type HttpError, WrappedPromise } from './utils';
 
 const correctBody = {
   '114514': '1919810'
@@ -715,6 +715,63 @@ describe('cors.test.js', () => {
         .expect('Vary', 'Accept-Encoding, Origin')
         .expect(correctBody)
         .expect(200);
+    });
+  });
+
+  describe('other middleware has set vary header on Error', () => {
+    it('should append `Origin to other `Vary` header', async () => {
+      const app = new Koa();
+      app.use(cors());
+
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        const error = new Error('Whoops!') as HttpError;
+        error.headers = { Vary: 'Accept-Encoding' };
+        throw error;
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Vary', 'Accept-Encoding, Origin')
+        .expect(/Error/)
+        .expect(500);
+    });
+    it('should preserve `Vary: *`', async () => {
+      const app = new Koa();
+      app.use(cors());
+
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        const error = new Error('Whoops!') as HttpError;
+        error.headers = { Vary: '*' };
+        throw error;
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Vary', '*')
+        .expect(/Error/)
+        .expect(500);
+    });
+    it('should not append Origin` if already present in `Vary`', async () => {
+      const app = new Koa();
+      app.use(cors());
+
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        const error = new Error('Whoops!') as HttpError;
+        error.headers = { Vary: 'Origin, Accept-Encoding' };
+        throw error;
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Vary', 'Origin, Accept-Encoding')
+        .expect(/Error/)
+        .expect(500);
     });
   });
 });
