@@ -321,4 +321,44 @@ describe('cors.test.js', function () {
         .expect(200);
     });
   });
+
+  describe('options.exposeHeaders', () => {
+    it('should Access-Control-Expose-Headers: `content-length`', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          exposeHeaders: 'content-length'
+        })
+      );
+      app.use(function (ctx) {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Expose-Headers', 'content-length')
+        .expect(correctBody)
+        .expect(200);
+    });
+
+    it('should work with array', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          exposeHeaders: ['content-length', 'x-header']
+        })
+      );
+      app.use(function (ctx) {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Expose-Headers', 'content-length,x-header')
+        .expect(correctBody)
+        .expect(200);
+    });
+  });
 });
