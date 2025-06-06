@@ -169,7 +169,7 @@ describe('cors.test.js', () => {
     });
   });
 
-  describe('options.origin=function', () => {
+  describe('options.origin=func', () => {
     const app = new Koa();
     app.use(
       cors({
@@ -246,7 +246,7 @@ describe('cors.test.js', () => {
     });
   });
 
-  describe('options.origin=async function', () => {
+  describe('options.origin=async func', () => {
     const app = new Koa();
     app.use(
       cors({
@@ -389,6 +389,34 @@ describe('cors.test.js', () => {
         .set('Access-Control-Request-Method', 'DELETE')
         .expect('Access-Control-Allow-Credentials', 'true')
         .expect(204);
+    });
+  });
+
+  describe('options.credentials unset', () => {
+    const app = new Koa();
+    app.use(cors());
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('should disable Access-Control-Allow-Credentials on Simple request', async () => {
+      const res = await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect(correctBody)
+        .expect(200);
+      expect(!res.header['access-control-allow-credentials']).toBe(true);
+    });
+
+    it('should disable Access-Control-Allow-Credentials on Preflight request', async () => {
+      const res = await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'DELETE')
+        .expect(204);
+
+      const header = res.headers['access-control-allow-credentials'];
+      assert.equal(!header, true, 'Access-Control-Allow-Credentials must not be set.');
     });
   });
 });
