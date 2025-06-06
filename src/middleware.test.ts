@@ -510,4 +510,99 @@ describe('cors.test.js', () => {
         .expect(200);
     });
   });
+
+  describe('options.allowHeaders', () => {
+    it('should work with allowHeaders is string', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          allowHeaders: 'X-PINGOTHER'
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .expect(204);
+    });
+
+    it('should work with allowHeaders is array', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          allowHeaders: ['X-PINGOTHER']
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .expect(204);
+    });
+
+    it('should set Access-Control-Allow-Headers to request access-control-request-headers header', async () => {
+      const app = new Koa();
+      app.use(cors());
+      app.use((ctx) => {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .set('access-control-request-headers', 'X-PINGOTHER')
+        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .expect(204);
+    });
+  });
+
+    describe('options.allowMethods', () => {
+    it('should work with allowMethods is array', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          allowMethods: ['GET', 'POST']
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .expect('Access-Control-Allow-Methods', 'GET,POST')
+        .expect(204);
+    });
+
+    it('should skip allowMethods', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          allowMethods: null
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .expect(204);
+    });
+  });
 });

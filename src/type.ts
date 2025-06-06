@@ -29,7 +29,7 @@ interface Options {
    * `Access-Control-Allow-Methods`, default is
    * 'GET,HEAD,PUT,POST,DELETE,PATCH'
    */
-  allowMethods?: string[] | string | undefined;
+  allowMethods?: string[] | string | undefined | null;
 
   /**
    * `Access-Control-Expose-Headers`
