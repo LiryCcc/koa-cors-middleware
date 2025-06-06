@@ -567,7 +567,7 @@ describe('cors.test.js', () => {
     });
   });
 
-    describe('options.allowMethods', () => {
+  describe('options.allowMethods', () => {
     it('should work with allowMethods is array', async () => {
       const app = new Koa();
       app.use(
@@ -603,6 +603,95 @@ describe('cors.test.js', () => {
         .set('Origin', 'http://koajs.com')
         .set('Access-Control-Request-Method', 'PUT')
         .expect(204);
+    });
+  });
+
+  describe('options.headersKeptOnError', () => {
+    it('should keep CORS headers after an error', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          origin(ctx) {
+            return ctx.get('Origin') || '*';
+          }
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        throw new Error('Whoops!');
+      });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect('Vary', 'Origin')
+        .expect(/Error/)
+        .expect(500);
+    });
+
+    it('should not affect OPTIONS requests', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          origin(ctx) {
+            return ctx.get('Origin') || '*';
+          }
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        throw new Error('Whoops!');
+      });
+
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'PUT')
+        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(204);
+    });
+
+    it('should not keep unrelated headers', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          origin(ctx) {
+            return ctx.get('Origin') || '*';
+          }
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        ctx.set('X-Example', 'Value');
+        throw new Error('Whoops!');
+      });
+
+      const res = await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(/Error/)
+        .expect(500);
+
+      assert(!res.headers['x-example']);
+    });
+
+    it('should not keep CORS headers after an error if keepHeadersOnError is false', async () => {
+      const app = new Koa();
+      app.use(
+        cors({
+          keepHeadersOnError: false
+        })
+      );
+      app.use((ctx) => {
+        ctx.body = correctBody;
+        throw new Error('Whoops!');
+      });
+
+      const res = await request(app.listen()).get('/').set('Origin', 'http://koajs.com').expect(/Error/).expect(500);
+      assert(!res.headers['access-control-allow-origin']);
+      assert(!res.headers.vary);
     });
   });
 });
