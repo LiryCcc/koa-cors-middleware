@@ -2,6 +2,7 @@ import Koa from 'koa';
 import request from 'supertest';
 import { assert, describe, expect, it } from 'vitest';
 import cors from './middleware';
+import { WrappedPromise } from './utils';
 
 const correctBody = {
   '114514': '1919810'
@@ -281,24 +282,6 @@ describe('cors.test.js', () => {
     });
 
     it('behaves correctly when the return type is promise-like', async () => {
-      class WrappedPromise<T> implements PromiseLike<T> {
-        /**
-         * The internally held Promise instance.
-         */
-        private internalPromise: Promise<T>;
-
-        constructor(executor: (resolve: (value: T) => void, reject: (reason?: T) => void) => void) {
-          this.internalPromise = new Promise<T>(executor);
-        }
-
-        then<TResult1, TResult2>(
-          onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
-          onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | undefined | null
-        ): PromiseLike<TResult1 | TResult2> {
-          return this.internalPromise.then(onfulfilled, onrejected); // This matches the PromiseLike signature
-        }
-      }
-
       const app = new Koa()
         .use(
           cors({
@@ -470,6 +453,61 @@ describe('cors.test.js', () => {
         .expect(204);
       const header = res.headers['access-control-allow-credentials'];
       assert.equal(header, undefined, 'Access-Control-Allow-Credentials must not be set.');
+    });
+  });
+
+  describe('options.credentials=async function', () => {
+    const app = new Koa();
+    app.use(
+      cors({
+        async credentials() {
+          return true;
+        }
+      })
+    );
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Simple request', async () => {
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(correctBody)
+        .expect(200);
+    });
+
+    it('should enable Access-Control-Allow-Credentials on Preflight request', async () => {
+      await request(app.listen())
+        .options('/')
+        .set('Origin', 'http://koajs.com')
+        .set('Access-Control-Request-Method', 'DELETE')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(204);
+    });
+
+    it('behaves correctly when the return type is promise-like', async () => {
+      const app = new Koa()
+        .use(
+          cors({
+            credentials() {
+              return new WrappedPromise((resolve) => {
+                resolve(true);
+              });
+            }
+          })
+        )
+        .use((ctx) => {
+          ctx.body = correctBody;
+        });
+
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(correctBody)
+        .expect(200);
     });
   });
 });
