@@ -23,6 +23,7 @@
     "package.json"
   ],
   "scripts": {
+    "prebuild": "pnpm typecheck",
     "build": "rollup -c",
     "check-code": "eslint --cache .",
     "check-format": "prettier --check --cache .",
@@ -31,6 +32,7 @@
     "pub": "node pub-all.js",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "postversion": "git push -u origin --tags && git push -u origin --all"
   },
   "dependencies": {
