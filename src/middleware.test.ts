@@ -890,4 +890,27 @@ describe('cors.test.js', () => {
         .expect(200);
     });
   });
+
+  describe('options.origin=*, and options.credentials=false', () => {
+    const app = new Koa();
+    app.use(
+      cors({
+        origin: '*',
+        credentials: false
+      })
+    );
+
+    app.use((ctx) => {
+      ctx.body = correctBody;
+    });
+
+    it('Access-Control-Allow-Origin should be *', async () => {
+      await request(app.listen())
+        .get('/')
+        .set('Origin', 'http://koajs.com')
+        .expect('Access-Control-Allow-Origin', '*')
+        .expect(correctBody)
+        .expect(200);
+    });
+  });
 });
