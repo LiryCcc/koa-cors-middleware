@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import request from 'supertest';
 import { assert, describe, expect, it } from 'vitest';
+import { acac, acah, acam, acao, acapn, aceh, acrh, acrm, acrpn, coep, coop, rc, so } from './headers';
 import cors from './middleware';
 import { type HttpError, WrappedPromise } from './utils';
 
@@ -17,14 +18,14 @@ describe('cors.test.js', () => {
     });
 
     it('should set `Access-Control-Allow-Origin` to `*` when request Origin header missing', async () => {
-      await request(app.listen()).get('/').expect(correctBody).expect('access-control-allow-origin', '*').expect(200);
+      await request(app.listen()).get('/').expect(correctBody).expect(acao, '*').expect(200);
     });
 
     it('should set `Access-Control-Allow-Origin` to `*`', async () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(correctBody)
         .expect(200);
     });
@@ -33,9 +34,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Access-Control-Allow-Origin', '*')
-        .expect('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE,PATCH')
+        .set(acrm, 'PUT')
+        .expect(acao, '*')
+        .expect(acam, 'GET,HEAD,PUT,POST,DELETE,PATCH')
         .expect(204);
     });
 
@@ -68,13 +69,13 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(correctBody)
         .expect(200);
     });
 
     it('should always set `Access-Control-Allow-Origin` to *, even if no Origin is passed on request', async () => {
-      await request(app.listen()).get('/').expect('Access-Control-Allow-Origin', '*').expect(correctBody).expect(200);
+      await request(app.listen()).get('/').expect(acao, '*').expect(correctBody).expect(200);
     });
   });
 
@@ -95,7 +96,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(acao, 'http://koajs.com')
         .expect(correctBody)
         .expect(200);
     });
@@ -104,13 +105,13 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('origin', 'http://origin.koajs.com')
-        .expect('Access-Control-Allow-Origin', 'http://origin.koajs.com')
+        .expect(acao, 'http://origin.koajs.com')
         .expect(correctBody)
         .expect(200);
     });
 
     it('should set `Access-Control-Allow-Origin` to `*`, even if no Origin is passed on request', async () => {
-      await request(app.listen()).get('/').expect('Access-Control-Allow-Origin', '*').expect(correctBody).expect(200);
+      await request(app.listen()).get('/').expect(acao, '*').expect(correctBody).expect(200);
     });
   });
 
@@ -129,8 +130,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Cross-Origin-Opener-Policy', 'same-origin')
-        .expect('Cross-Origin-Embedder-Policy', 'require-corp')
+        .expect(coop, so)
+        .expect(coep, rc)
         .expect(correctBody)
         .expect(200);
     });
@@ -139,9 +140,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Cross-Origin-Opener-Policy', 'same-origin')
-        .expect('Cross-Origin-Embedder-Policy', 'require-corp')
+        .set(acrm, 'PUT')
+        .expect(coop, so)
+        .expect(coep, rc)
         .expect(204);
     });
   });
@@ -162,8 +163,8 @@ describe('cors.test.js', () => {
         .get('/')
         .set('Origin', 'http://koajs.com')
         .expect((res) => {
-          assert(!('Cross-Origin-Opener-Policy' in res.headers));
-          assert(!('Cross-Origin-Embedder-Policy' in res.headers));
+          assert(!(coop in res.headers));
+          assert(!(coep in res.headers));
         })
         .expect(correctBody)
         .expect(200);
@@ -195,7 +196,7 @@ describe('cors.test.js', () => {
       // 这里是新版写法
       console.log('Checking headers...');
       console.log('res.headers:', res.headers);
-      expect(!res.headers['Access-Control-Allow-Origin']).toBeTruthy();
+      expect(!res.headers[acao]).toBeTruthy();
     });
 
     it('should set access-control-allow-origin to *', async () => {
@@ -203,7 +204,7 @@ describe('cors.test.js', () => {
         .get('/')
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(200);
     });
   });
@@ -234,7 +235,7 @@ describe('cors.test.js', () => {
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
         .expect(200);
-      expect(!res.headers['Access-Control-Allow-Origin']).toEqual(true);
+      expect(!res.headers[acao]).toEqual(true);
     });
 
     it('should set access-control-allow-origin to *', async () => {
@@ -242,7 +243,7 @@ describe('cors.test.js', () => {
         .get('/')
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(200);
     });
   });
@@ -269,7 +270,7 @@ describe('cors.test.js', () => {
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
         .expect(200);
-      expect(!res.headers['Access-Control-Allow-Origin']).toBe(true);
+      expect(!res.headers[acao]).toBe(true);
     });
 
     it('should set access-control-allow-origin to *', async () => {
@@ -277,7 +278,7 @@ describe('cors.test.js', () => {
         .get('/')
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(200);
     });
 
@@ -300,7 +301,7 @@ describe('cors.test.js', () => {
         .get('/')
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(200);
     });
   });
@@ -320,7 +321,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Expose-Headers', 'content-length')
+        .expect(aceh, 'content-length')
         .expect(correctBody)
         .expect(200);
     });
@@ -339,7 +340,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Expose-Headers', 'content-length,x-header')
+        .expect(aceh, 'content-length,x-header')
         .expect(correctBody)
         .expect(200);
     });
@@ -360,7 +361,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(acac, 'true')
         .expect(correctBody)
         .expect(200);
     });
@@ -369,8 +370,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'DELETE')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .set(acrm, 'DELETE')
+        .expect(acac, 'true')
         .expect(204);
     });
   });
@@ -388,17 +389,17 @@ describe('cors.test.js', () => {
         .set('Origin', 'http://koajs.com')
         .expect(correctBody)
         .expect(200);
-      expect(!res.header['access-control-allow-credentials']).toBe(true);
+      expect(!res.header[acac]).toBe(true);
     });
 
     it('should disable Access-Control-Allow-Credentials on Preflight request', async () => {
       const res = await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'DELETE')
+        .set(acrm, 'DELETE')
         .expect(204);
 
-      const header = res.headers['access-control-allow-credentials'];
+      const header = res.headers[acac];
       assert.equal(!header, true, 'Access-Control-Allow-Credentials must not be set.');
     });
   });
@@ -420,7 +421,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(acac, 'true')
         .expect(correctBody)
         .expect(200);
     });
@@ -429,8 +430,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'DELETE')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .set(acrm, 'DELETE')
+        .expect(acac, 'true')
         .expect(204);
     });
 
@@ -441,7 +442,7 @@ describe('cors.test.js', () => {
         .expect(correctBody)
         .expect(200);
 
-      const header = res.headers['access-control-allow-credentials'];
+      const header = res.headers[acac];
       assert.equal(header, undefined, 'Access-Control-Allow-Credentials must not be set.');
     });
 
@@ -449,9 +450,9 @@ describe('cors.test.js', () => {
       const res = await request(app.listen())
         .options('/forbin')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'DELETE')
+        .set(acrm, 'DELETE')
         .expect(204);
-      const header = res.headers['access-control-allow-credentials'];
+      const header = res.headers[acac];
       assert.equal(header, undefined, 'Access-Control-Allow-Credentials must not be set.');
     });
   });
@@ -473,7 +474,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(acac, 'true')
         .expect(correctBody)
         .expect(200);
     });
@@ -482,8 +483,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'DELETE')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .set(acrm, 'DELETE')
+        .expect(acac, 'true')
         .expect(204);
     });
 
@@ -505,7 +506,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Credentials', 'true')
+        .expect(acac, 'true')
         .expect(correctBody)
         .expect(200);
     });
@@ -526,8 +527,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .set(acrm, 'PUT')
+        .expect(acah, 'X-PINGOTHER')
         .expect(204);
     });
 
@@ -545,8 +546,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .set(acrm, 'PUT')
+        .expect(acah, 'X-PINGOTHER')
         .expect(204);
     });
 
@@ -560,9 +561,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .set('access-control-request-headers', 'X-PINGOTHER')
-        .expect('Access-Control-Allow-Headers', 'X-PINGOTHER')
+        .set(acrm, 'PUT')
+        .set(acrh, 'X-PINGOTHER')
+        .expect(acah, 'X-PINGOTHER')
         .expect(204);
     });
   });
@@ -582,8 +583,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Access-Control-Allow-Methods', 'GET,POST')
+        .set(acrm, 'PUT')
+        .expect(acam, 'GET,POST')
         .expect(204);
     });
 
@@ -598,11 +599,7 @@ describe('cors.test.js', () => {
         ctx.body = correctBody;
       });
 
-      await request(app.listen())
-        .options('/')
-        .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect(204);
+      await request(app.listen()).options('/').set('Origin', 'http://koajs.com').set(acrm, 'PUT').expect(204);
     });
   });
 
@@ -624,7 +621,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(acao, 'http://koajs.com')
         .expect('Vary', 'Origin')
         .expect(/Error/)
         .expect(500);
@@ -647,8 +644,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .set(acrm, 'PUT')
+        .expect(acao, 'http://koajs.com')
         .expect(204);
     });
 
@@ -670,7 +667,7 @@ describe('cors.test.js', () => {
       const res = await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(acao, 'http://koajs.com')
         .expect(/Error/)
         .expect(500);
 
@@ -690,7 +687,7 @@ describe('cors.test.js', () => {
       });
 
       const res = await request(app.listen()).get('/').set('Origin', 'http://koajs.com').expect(/Error/).expect(500);
-      assert(!res.headers['access-control-allow-origin']);
+      assert(!res.headers[acao]);
       assert(!res.headers.vary);
     });
   });
@@ -791,9 +788,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
+        .set(acrm, 'PUT')
         .expect((res) => {
-          assert(!('Access-Control-Allow-Private-Network' in res.headers));
+          assert(!(acapn in res.headers));
         })
         .expect(200);
     });
@@ -802,9 +799,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
+        .set(acrm, 'PUT')
         .expect((res) => {
-          assert(!('Access-Control-Allow-Private-Network' in res.headers));
+          assert(!(acapn in res.headers));
         })
         .expect(204);
     });
@@ -813,10 +810,10 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .set('Access-Control-Request-Private-Network', 'true')
+        .set(acrm, 'PUT')
+        .set(acrpn, 'true')
         .expect((res) => {
-          assert(!('Access-Control-Allow-Private-Network' in res.headers));
+          assert(!(acapn in res.headers));
         })
         .expect(204);
     });
@@ -838,9 +835,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
+        .set(acrm, 'PUT')
         .expect((res) => {
-          assert(!('Access-Control-Allow-Private-Network' in res.headers));
+          assert(!(acapn in res.headers));
         })
         .expect(200);
     });
@@ -849,9 +846,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
+        .set(acrm, 'PUT')
         .expect((res) => {
-          assert(!('Access-Control-Allow-Private-Network' in res.headers));
+          assert(!(acapn in res.headers));
         })
         .expect(204);
     });
@@ -860,9 +857,9 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .options('/')
         .set('Origin', 'http://koajs.com')
-        .set('Access-Control-Request-Method', 'PUT')
-        .set('Access-Control-Request-Private-Network', 'true')
-        .expect('Access-Control-Allow-Private-Network', 'true')
+        .set(acrm, 'PUT')
+        .set(acrpn, 'true')
+        .expect(acapn, 'true')
         .expect(204);
     });
   });
@@ -884,8 +881,8 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Credentials', 'true')
-        .expect('Access-Control-Allow-Origin', 'http://koajs.com')
+        .expect(acac, 'true')
+        .expect(acao, 'http://koajs.com')
         .expect(correctBody)
         .expect(200);
     });
@@ -908,7 +905,7 @@ describe('cors.test.js', () => {
       await request(app.listen())
         .get('/')
         .set('Origin', 'http://koajs.com')
-        .expect('Access-Control-Allow-Origin', '*')
+        .expect(acao, '*')
         .expect(correctBody)
         .expect(200);
     });
