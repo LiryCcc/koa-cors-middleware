@@ -7,11 +7,11 @@ const correctBody = {
   '114514': '1919810'
 };
 
-describe('cors.test.js', function () {
-  describe('default options', function () {
+describe('cors.test.js', () => {
+  describe('default options', () => {
     const app = new Koa();
     app.use(cors());
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -52,14 +52,14 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.origin=*', function () {
+  describe('options.origin=*', () => {
     const app = new Koa();
     app.use(
       cors({
         origin: '*'
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -77,7 +77,7 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.origin set the request Origin header', function () {
+  describe('options.origin set the request Origin header', () => {
     const app = new Koa();
     app.use(
       cors({
@@ -86,7 +86,7 @@ describe('cors.test.js', function () {
         }
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -113,14 +113,14 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.secureContext=true', function () {
+  describe('options.secureContext=true', () => {
     const app = new Koa();
     app.use(
       cors({
         secureContext: true
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -145,14 +145,14 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.secureContext=false', function () {
+  describe('options.secureContext=false', () => {
     const app = new Koa();
     app.use(
       cors({
         secureContext: false
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -181,7 +181,7 @@ describe('cors.test.js', function () {
         }
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -207,7 +207,7 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.origin=promise', function () {
+  describe('options.origin=promise', () => {
     const app = new Koa();
     app.use(
       cors({
@@ -223,7 +223,7 @@ describe('cors.test.js', function () {
         }
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -246,7 +246,7 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.origin=async function', function () {
+  describe('options.origin=async function', () => {
     const app = new Koa();
     app.use(
       cors({
@@ -258,7 +258,7 @@ describe('cors.test.js', function () {
         }
       })
     );
-    app.use(function (ctx) {
+    app.use((ctx) => {
       ctx.body = correctBody;
     });
 
@@ -309,7 +309,7 @@ describe('cors.test.js', function () {
             }
           })
         )
-        .use(function (ctx) {
+        .use((ctx) => {
           ctx.body = correctBody;
         });
 
@@ -330,7 +330,7 @@ describe('cors.test.js', function () {
           exposeHeaders: 'content-length'
         })
       );
-      app.use(function (ctx) {
+      app.use((ctx) => {
         ctx.body = correctBody;
       });
 
@@ -349,7 +349,7 @@ describe('cors.test.js', function () {
           exposeHeaders: ['content-length', 'x-header']
         })
       );
-      app.use(function (ctx) {
+      app.use((ctx) => {
         ctx.body = correctBody;
       });
 
@@ -362,7 +362,7 @@ describe('cors.test.js', function () {
     });
   });
 
-  describe('options.credentials', function () {
+  describe('options.credentials', () => {
     const app = new Koa();
     app.use(
       cors({
