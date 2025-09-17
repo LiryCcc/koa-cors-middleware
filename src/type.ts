@@ -1,5 +1,4 @@
-import * as Koa from 'koa';
-import { Context } from 'koa';
+import type { Context } from 'koa';
 
 // /**
 //  * CORS middleware factory.
@@ -54,7 +53,7 @@ interface Options {
    * the koa context object. It may return a boolean or a promise that
    * will resolve with a boolean.
    */
-  credentials?: ((ctx: Koa.Context) => boolean) | ((ctx: Koa.Context) => PromiseLike<boolean>) | boolean | undefined;
+  credentials?: ((ctx: Context) => boolean) | ((ctx: Context) => PromiseLike<boolean>) | boolean | undefined;
 
   /**
    * Add set headers to `err.header` if an error is thrown

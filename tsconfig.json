@@ -12,6 +12,7 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "verbatimModuleSyntax": true,
     "paths": {
       "@/*": ["src/*"]
     }
