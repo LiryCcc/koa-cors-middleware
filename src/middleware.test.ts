@@ -3,7 +3,7 @@ import request from 'supertest';
 import { assert, describe, expect, it } from 'vitest';
 import { acac, acah, acam, acao, acapn, aceh, acrh, acrm, acrpn, coep, coop, rc, so } from './headers';
 import cors from './middleware';
-import { type HttpError, WrappedPromise } from './utils';
+import { type HttpError } from './utils';
 
 const correctBody = {
   '114514': '1919810'
@@ -287,7 +287,7 @@ describe('cors.test.js', () => {
         .use(
           cors({
             origin() {
-              return new WrappedPromise((resolve) => {
+              return new Promise((resolve) => {
                 return resolve('*');
               });
             }
@@ -493,7 +493,7 @@ describe('cors.test.js', () => {
         .use(
           cors({
             credentials() {
-              return new WrappedPromise((resolve) => {
+              return new Promise((resolve) => {
                 resolve(true);
               });
             }
